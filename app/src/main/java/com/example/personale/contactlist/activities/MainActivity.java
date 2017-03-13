@@ -1,7 +1,9 @@
 package com.example.personale.contactlist.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -9,6 +11,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -25,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     RecyclerView recyclerView;
     ContactAdapter contactAdapter;
     FloatingActionButton fab;
+    public static final int STAGGERED_LAYOUT = 10;
+    public static final int LINEAR_LAYOUT = 20;
+    private int stateLayout = LINEAR_LAYOUT;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,6 +44,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fab = (FloatingActionButton)findViewById(R.id.add_contact);
         fab.setOnClickListener(this);
         initializeComponent();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.name_layout_preferences), Context.MODE_PRIVATE).edit();
+        editor.putInt(getString(R.string.state_layout_preferences), stateLayout);
+        editor.apply();
     }
 
     @Override
@@ -86,5 +102,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         contactAdapter.loadFromDb();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_layout:
+                setLayout(item);
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void setLayout(MenuItem item) {
+        switch (stateLayout){
+            case STAGGERED_LAYOUT:
+                recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                stateLayout = LINEAR_LAYOUT;
+                break;
+            case LINEAR_LAYOUT:
+                recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+                stateLayout = STAGGERED_LAYOUT;
+                break;
+        }
+
+        item.setIcon(stateLayout == LINEAR_LAYOUT ? R.drawable.ic_linear : R.drawable.ic_staggered);
     }
 }

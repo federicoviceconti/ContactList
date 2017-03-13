@@ -85,6 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/phone_et"
+            android:inputType="textEmailAddress"
             android:layout_below="@id/address_et"
             android:layout_toEndOf="@id/name_tv"
             android:layout_toRightOf="@id/name_tv" />
